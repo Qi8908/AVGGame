@@ -1,2 +1,0 @@
-# AVGGame
- Graduation project

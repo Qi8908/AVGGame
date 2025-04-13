@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class VNManager : MonoBehaviour
 {
+    public GameObject gamePanel;
+    public GameObject dialogueBox;
     public TextMeshProUGUI speakerName;
     public TextMeshProUGUI speakingContent;
     public TypewriterEffect typewriterEffect;
@@ -15,7 +17,7 @@ public class VNManager : MonoBehaviour
     public AudioSource vocalAudio;
     public Image backgroundImage;
     public AudioSource backgroundMusic;
-    public GameObject speakerPanel; // RQ
+    public GameObject speakerPanel;
     public Image characterImage1;
     public Image characterImage2;
     public GameObject choicePanel;
@@ -24,8 +26,13 @@ public class VNManager : MonoBehaviour
     public GameObject bottomButtons;
     public Button autoButton;
     public Button skipButton;
+    public GameObject topButtons;
     public Button saveButton;
     public Button loadButton;
+    public Button historyButton;
+    public Button settingsButton;
+    public Button homeButton;
+    //public Button closeButton;
 
     private readonly string storyPath = Constants.STORY_PATH;
     private readonly string defaultStoryFileName = Constants.DEFAULT_STORY_FILE_NAME;
@@ -39,19 +46,34 @@ public class VNManager : MonoBehaviour
     private int maxReachedLineIndex = 0;
     private Dictionary<string, int> globalMaxReachedLineIndices = new Dictionary<string, int>(); // 全局储存每个文件的最远行索引
 
+    public static VNManager Instance { get; private set; }
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     void Start()
     {
-        InitializeAndLoadStory(defaultStoryFileName);
         BottomButtonsAddListener();
+        TopButtonsAddListener();
+        gamePanel.SetActive(false);
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (gamePanel.activeSelf && Input.GetMouseButtonDown(0))
         {
-            if (!IsHittingBottomButtons())
+            if (!IsHittingBottomButtons() && !IsHittingTopButtons())
             {
-                DisplayNextLine();
+                if (!SaveLoadManager.Instance.saveLoadPanel.activeSelf)
+                {
+                    DisplayNextLine();
+                }
             }
         }
     }
@@ -68,8 +90,18 @@ public class VNManager : MonoBehaviour
     {
         autoButton.onClick.AddListener(OnAutoButtonClick);
         skipButton.onClick.AddListener(OnSkipButtonClick);
+    }
+
+    void TopButtonsAddListener()
+    {
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
+        homeButton.onClick.AddListener(OnHomeButtonClick);
+    }
+
+    public void StartGame()
+    {
+        InitializeAndLoadStory(defaultStoryFileName);
     }
 
     void Initialize()
@@ -339,6 +371,15 @@ public class VNManager : MonoBehaviour
         );
     }
 
+    bool IsHittingTopButtons()
+    {
+        return RectTransformUtility.RectangleContainsScreenPoint(
+            topButtons.GetComponent<RectTransform>(),
+            Input.mousePosition,
+            null
+        );
+    }
+
     void OnAutoButtonClick()
     {
         isAutoPlay = !isAutoPlay;
@@ -424,6 +465,12 @@ public class VNManager : MonoBehaviour
     {
         string imagePath = Constants.BUTTON_PATH + imageFileName;
         UpdateImage(imagePath, button.image);
+    }
+
+    void OnHomeButtonClick()
+    {
+        gamePanel.SetActive(false);
+        MenuManager.Instance.menuPanel.SetActive(true);
     }
 }
 
