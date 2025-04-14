@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class MenuManager : MonoBehaviour
 {
     public GameObject menuPanel;
+    public AudioClip menuMusicClip;
+    private AudioSource audioSource;
     public Button startButton;
     public Button continueButton;
     public Button loadButton;
@@ -23,11 +25,20 @@ public class MenuManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = menuMusicClip;
+        audioSource.loop = true;
     }
 
     void Start()
     {
         menuButtonAddListener();
+
+        if (menuMusicClip != null)
+        {
+            audioSource.Play();
+        }
     }
 
     void menuButtonAddListener()
@@ -40,6 +51,7 @@ public class MenuManager : MonoBehaviour
     {
         hasStarted = true;
         VNManager.Instance.StartGame();
+        audioSource.Stop();
         menuPanel.SetActive(false);
         VNManager.Instance.gamePanel.SetActive(true);
     }
@@ -49,6 +61,7 @@ public class MenuManager : MonoBehaviour
         if (hasStarted)
         {
             menuPanel.SetActive(false);
+            audioSource.Stop();
             VNManager.Instance.gamePanel.SetActive(true);
         }
     }

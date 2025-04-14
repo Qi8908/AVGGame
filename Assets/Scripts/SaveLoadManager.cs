@@ -1,10 +1,13 @@
 using System.Collections;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using ExcelDataReader.Log.Logger;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using System;
 
 public class SaveLoadManager : MonoBehaviour
 {
@@ -16,6 +19,7 @@ public class SaveLoadManager : MonoBehaviour
     private bool isSave;
     private readonly int saveSlots = Constants.SAVE_SLOTS;
     private readonly int totalSlots = Constants.TOTAL_SLOTS;
+    private System.Action<int> currentAction;
 
     // 单例模式
     public static SaveLoadManager Instance { get; private set; }
@@ -36,52 +40,105 @@ public class SaveLoadManager : MonoBehaviour
         saveLoadPanel.SetActive(false);
     }
 
-    public void ShowSaveLoadUI(bool save)
+    public void ShowSavePanel(System.Action<int> action)
     {
-        isSave = save;
-        panelTitle.text = isSave ? Constants.SAVE_GAME : Constants.LOAD_GAME;
-        UpdateSaveLoadUI();
+        isSave = true;
+        panelTitle.text = Constants.SAVE_GAME;
+        currentAction = action;
+        UpdateUI();
         saveLoadPanel.SetActive(true);
-        LoadStorylineAndScreenshots();
     }
 
-    private void UpdateSaveLoadUI()
+    public void ShowLoadPanel(System.Action<int> action)
     {
-        for (int i = 0; i < totalSlots; i++)
+        isSave = false;
+        panelTitle.text = Constants.LOAD_GAME;
+        currentAction = action;
+        UpdateUI();
+        saveLoadPanel.SetActive(true);
+    }
+
+    private void UpdateUI()
+    {
+        for (int i = 0; i < saveLoadButtons.Length; ++i)
         {
-            saveLoadButtons[i].gameObject.SetActive(true);
-            saveLoadButtons[i].interactable = true;
-
-            // 更新保存栏位文本和图片
-            string slotText = (i + 1) + Constants.COLON + Constants.EMPTY_SLOT;
-            var textComponents = saveLoadButtons[i].GetComponentsInChildren<TextMeshProUGUI>();
-
-            if (textComponents.Length >= 2)
+            if (i < totalSlots)
             {
-                textComponents[0].text = null;
-                textComponents[1].text = slotText;
+                UpdateSaveLoadButtons(saveLoadButtons[i], i);
+                LoadStorylineAndScreenshots(saveLoadButtons[i], i);
+                saveLoadButtons[i].gameObject.SetActive(true);
             }
-
-            var previewImage = saveLoadButtons[i].GetComponentInChildren<RawImage>();
-            if (previewImage != null)
+            else
             {
-                previewImage.texture = null;
+                saveLoadButtons[i].gameObject.SetActive(false);
             }
         }
+    }
 
-        for (int i = totalSlots; i < saveLoadButtons.Length; i++)
+    private void UpdateSaveLoadButtons(Button button, int index)
+    {
+        button.gameObject.SetActive(true);
+        button.interactable = true;
+
+        var savePath = GenerateDataPath(index);
+        var fileExists = File.Exists(savePath);
+
+        if (!isSave && !fileExists)
         {
-            saveLoadButtons[i].gameObject.SetActive(false);
+            button.interactable = false;
         }
+
+        var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
+        textComponents[0].text = null;
+        textComponents[1].text = (index + 1) + Constants.COLON + Constants.EMPTY_SLOT;
+        button.GetComponentInChildren<RawImage>().texture = null;
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => OnButtonClick(button, index));
+    }
+
+    private void OnButtonClick(Button button, int index)
+    {
+        currentAction?.Invoke(index);
+        if (isSave)
+        {
+            LoadStorylineAndScreenshots(button, index);
+        }
+        else
+        {
+
+        }
+    }
+
+    private void LoadStorylineAndScreenshots(Button button, int index)
+    {
+        var savePath = GenerateDataPath(index);
+        if (File.Exists(savePath))
+        {
+            string json = File.ReadAllText(savePath);
+            var saveData = JsonConvert.DeserializeObject<VNManager.SaveData>(json);
+            if (saveData.screenShotData != null)
+            {
+                Texture2D screenShot = new Texture2D(2, 2);
+                screenShot.LoadImage(saveData.screenShotData);
+                button.GetComponentInChildren<RawImage>().texture = screenShot;
+            }
+            if (saveData.currentSpeakingContent != null)
+            {
+                var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
+                textComponents[0].text = saveData.currentSpeakingContent;
+                textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G"); // G 表示不同的时间格式
+            }
+        }
+    }
+
+    private string GenerateDataPath(int index)
+    {
+        return Path.Combine(Application.persistentDataPath, Constants.SAVE_FILE_PATH, index + Constants.SAVE_FILE_EXTENSION);
     }
 
     private void GoBack()
     {
         saveLoadPanel.SetActive(false);
-    }
-
-    private void LoadStorylineAndScreenshots()
-    {
-
     }
 }

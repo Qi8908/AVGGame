@@ -9,12 +9,13 @@ public class TypewriterEffect : MonoBehaviour
     public float waitingSeconds = Constants.DEFAULT_TYPING_SECONDS;
     private Coroutine typingCoroutine;
     private bool isTyping;
-    public float typingSpeed = 0.05f;
+    private float typingSpeed = 0.05f;
 
     public System.Action onTypingComplete;
 
-    public void StartTyping(string text)
+    public void StartTyping(string text, float speed)
     {
+        typingSpeed = speed;
         if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
@@ -48,8 +49,5 @@ public class TypewriterEffect : MonoBehaviour
         isTyping = false;
     }
 
-    public bool IsTyping()
-    {
-        return isTyping;
-    }
+    public bool IsTyping() => isTyping;
 }

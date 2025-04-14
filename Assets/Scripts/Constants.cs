@@ -13,7 +13,7 @@ public class Constants
     public static string CHOICE = "Choice";
 
     // TypewriterEffect
-    public static float DEFAULT_TYPING_SECONDS = 0.05f;
+    public static float DEFAULT_TYPING_SECONDS = 0.5f; // 0.05f
 
     // Dialogue
     public static string AVATAR_PATH = "Avatar/";
@@ -51,10 +51,13 @@ public class Constants
     public static string SAVE_GAME = "save_game";
     public static string LOAD_GAME = "load_game";
     public static string EMPTY_SLOT = "empty_slot";
+    public static string SAVE_FILE_PATH = "saves";
+    public static string SAVE_FILE_EXTENSION = ".json";
 
     // Error
     public static string AUDIO_LOAD_FAILED = "Failed to load audio";
     public static string IMAGE_LOAD_FAILED = "Failed to load image";
     public static string NO_DATA_FOUND = "No data found";
     public static string COORDINATE_MISSING = "Coordinate missing";
+    public static string CAMERA_NOT_FOUND = "Camera not found";
 }
