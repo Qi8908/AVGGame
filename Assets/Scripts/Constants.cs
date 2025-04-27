@@ -36,7 +36,7 @@ public class Constants
     public static string SKIP_ON = "skipOn";
     public static string SKIP_OFF = "skipOff";
     public static float SKIP_MODE_TYPING_SPEED = 0.02f;
-    public static float DEFAULT_SKIP_SECONDS = 0.05f;
+    public static float DEFAULT_SKIP_WAITING_SECONDS = 0.05f;
 
     // Action
     public static string APPEAR_AT = "appearAt";
@@ -53,6 +53,9 @@ public class Constants
     public static string EMPTY_SLOT = "empty_slot";
     public static string SAVE_FILE_PATH = "saves";
     public static string SAVE_FILE_EXTENSION = ".json";
+
+    // History
+    public static int MAX_LENGTH = 50;
 
     // Error
     public static string AUDIO_LOAD_FAILED = "Failed to load audio";

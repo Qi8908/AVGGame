@@ -60,6 +60,7 @@ public class VNManager : MonoBehaviour
     private int maxReachedLineIndex = 0;
 
     private Dictionary<string, int> globalMaxReachedLineIndices = new Dictionary<string, int>(); // 全局储存每个文件的最远行索引
+    private LinkedList<string> historyRecords = new LinkedList<string>();
     #endregion
 
     #region LifeCycle
@@ -84,15 +85,33 @@ public class VNManager : MonoBehaviour
 
     void Update()
     {
-        if (!MenuManager.Instance.menuPanel.activeSelf && !SaveLoadManager.Instance.saveLoadPanel.activeSelf && gamePanel.activeSelf && Input.GetMouseButtonDown(0))
+        if (!MenuManager.Instance.menuPanel.activeSelf && !SaveLoadManager.Instance.saveLoadPanel.activeSelf && !HistoryManager.Instance.historyScrollView.activeSelf && gamePanel.activeSelf)
         {
-            if (!dialogueBox.activeSelf)
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
             {
-                OpenUI();
+                if (!dialogueBox.activeSelf)
+                {
+                    OpenUI();
+                }
+                else if (!IsHittingBottomButtons() && !IsHittingTopButtons())
+                {
+                    DisplayNextLine();
+                }
             }
-            else if (!IsHittingBottomButtons() && !IsHittingTopButtons())
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                DisplayNextLine();
+                if (dialogueBox.activeSelf)
+                {
+                    CloseUI();
+                }
+                else
+                {
+                    OpenUI();
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            {
+                CtrlSkip();
             }
         }
     }
@@ -118,6 +137,7 @@ public class VNManager : MonoBehaviour
     {
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
+        historyButton.onClick.AddListener(OnHistoryButtonClick);
         homeButton.onClick.AddListener(OnHomeButtonClick);
     }
 
@@ -222,6 +242,8 @@ public class VNManager : MonoBehaviour
         currentSpeakingContent = data.speakingContent;
         typewriterEffect.StartTyping(currentSpeakingContent, currentTypingSpeed);
 
+        RecordHistory(speakerName.text, currentSpeakingContent); // 记录历史文本
+
         // Avatar
         if (NotNullNorEmpty(data.avatarImageFileName))
         {
@@ -280,6 +302,36 @@ public class VNManager : MonoBehaviour
 
         currentLine++;
     }
+
+    //void RecordHistory(string speaker, string content)
+    //{
+    //string historyRecord = speaker + Constants.COLON + content;
+    //if (historyRecords.Count >= Constants.MAX_LENGTH)
+    //{
+    //historyRecords.RemoveFirst(); // 移除队列头部元素
+    //}
+    //historyRecords.AddLast(historyRecord); // 添加队列尾部元素
+    //}
+    void RecordHistory(string speaker, string content)
+    {
+        string historyRecord;
+
+        if (!string.IsNullOrEmpty(speaker))
+        {
+            historyRecord = speaker + Constants.COLON + content; // 有角色名，加冒号
+        }
+        else
+        {
+            historyRecord = content; // 没有角色名（旁白），直接用内容
+        }
+
+        if (historyRecords.Count >= Constants.MAX_LENGTH)
+        {
+            historyRecords.RemoveFirst();
+        }
+        historyRecords.AddLast(historyRecord);
+    }
+
 
     void RecoverLastBackgroundAndCharacter()
     {
@@ -515,7 +567,7 @@ public class VNManager : MonoBehaviour
             {
                 EndSkip();
             }
-            yield return new WaitForSeconds(Constants.DEFAULT_SKIP_SECONDS);
+            yield return new WaitForSeconds(Constants.DEFAULT_SKIP_WAITING_SECONDS);
         }
     }
 
@@ -525,6 +577,21 @@ public class VNManager : MonoBehaviour
         currentTypingSpeed = Constants.DEFAULT_TYPING_SECONDS;
         UpdateButtonImage(Constants.SKIP_OFF, skipButton);
     }
+
+    void CtrlSkip()
+    {
+        currentTypingSpeed = Constants.SKIP_MODE_TYPING_SPEED;
+        StartCoroutine(SkipWhilePressingCtrl());
+    }
+
+    private IEnumerator SkipWhilePressingCtrl()
+    {
+        while (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            DisplayNextLine();
+            yield return new WaitForSeconds(Constants.DEFAULT_SKIP_WAITING_SECONDS);
+        }
+    }
     #endregion
     #region Save & Load
     public class SaveData
@@ -533,6 +600,7 @@ public class VNManager : MonoBehaviour
         public int savedLine;
         public string savedSpeakingContent;
         public byte[] screenShotData;
+        public LinkedList<string> savedHistoryRecords;
     }
     void OnSaveButtonClick()
     {
@@ -550,7 +618,8 @@ public class VNManager : MonoBehaviour
             savedStoryFileName = currentStoryFileName,
             savedLine = currentLine,
             savedSpeakingContent = currentSpeakingContent,
-            screenShotData = screenShotData
+            screenShotData = screenShotData,
+            savedHistoryRecords = historyRecords // 历史记录也要跟随每个存档
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
         string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -575,6 +644,8 @@ public class VNManager : MonoBehaviour
             isLoad = true;
             string json = File.ReadAllText(savePath);
             var saveData = JsonConvert.DeserializeObject<SaveData>(json);
+            historyRecords = saveData.savedHistoryRecords;
+            historyRecords.RemoveLast(); // 加载存档时移除最后一条历史记录
             var lineNumber = saveData.savedLine - 1;
             InitializeAndLoadStory(saveData.savedStoryFileName, lineNumber);
         }
@@ -601,6 +672,14 @@ public class VNManager : MonoBehaviour
         dialogueBox.SetActive(false);
         bottomButtons.SetActive(false);
         topButtons.SetActive(false);
+    }
+    #endregion 
+    #region History
+    void OnHistoryButtonClick()
+    {
+        bottomButtons.SetActive(false);
+        topButtons.SetActive(false);
+        HistoryManager.Instance.ShowHistory(historyRecords);
     }
     #endregion
     #endregion

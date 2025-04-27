@@ -129,7 +129,12 @@ public class SaveLoadManager : MonoBehaviour
             if (saveData.savedSpeakingContent != null)
             {
                 var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
-                textComponents[0].text = saveData.savedSpeakingContent;
+
+                string shortContent = saveData.savedSpeakingContent.Length > 20
+                                        ? saveData.savedSpeakingContent.Substring(0, 20) + "..."
+                                        : saveData.savedSpeakingContent;
+
+                textComponents[0].text = shortContent;
                 textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G"); // G 表示不同的时间格式
             }
         }
