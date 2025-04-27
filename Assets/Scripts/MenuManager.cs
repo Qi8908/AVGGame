@@ -41,28 +41,45 @@ public class MenuManager : MonoBehaviour
         }
     }
 
+    public void StopMenuMusic()
+    {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+    }
+
     void menuButtonAddListener()
     {
         startButton.onClick.AddListener(StartGame);
         continueButton.onClick.AddListener(ContinueGame);
+        loadButton.onClick.AddListener(LoadGame);
     }
 
     private void StartGame()
     {
         hasStarted = true;
         VNManager.Instance.StartGame();
-        audioSource.Stop();
-        menuPanel.SetActive(false);
-        VNManager.Instance.gamePanel.SetActive(true);
+        StopMenuMusic();
+        ShowGamePanel();
     }
 
     private void ContinueGame()
     {
         if (hasStarted)
         {
-            menuPanel.SetActive(false);
-            audioSource.Stop();
-            VNManager.Instance.gamePanel.SetActive(true);
+            ShowGamePanel();
         }
+    }
+
+    private void LoadGame()
+    {
+        VNManager.Instance.ShowLoadPanel(ShowGamePanel);
+    }
+
+    private void ShowGamePanel()
+    {
+        menuPanel.SetActive(false);
+        VNManager.Instance.gamePanel.SetActive(true);
     }
 }

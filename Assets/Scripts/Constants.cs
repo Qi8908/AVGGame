@@ -13,7 +13,7 @@ public class Constants
     public static string CHOICE = "Choice";
 
     // TypewriterEffect
-    public static float DEFAULT_TYPING_SECONDS = 0.5f; // 0.05f
+    public static float DEFAULT_TYPING_SECONDS = 0.05f; // 0.05f
 
     // Dialogue
     public static string AVATAR_PATH = "Avatar/";
@@ -39,9 +39,9 @@ public class Constants
     public static float DEFAULT_SKIP_SECONDS = 0.05f;
 
     // Action
-    public static string Appear_At = "appearAt";
-    public static string Disappear = "disappear";
-    public static string Move_To = "moveTo";
+    public static string APPEAR_AT = "appearAt";
+    public static string DISAPPEAR = "disappear";
+    public static string MOVE_TO = "moveTo";
     public static int DURATION_TIME = 1;
 
     // Save & Load
