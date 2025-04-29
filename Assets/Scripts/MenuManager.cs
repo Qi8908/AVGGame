@@ -59,7 +59,8 @@ public class MenuManager : MonoBehaviour
     private void StartGame()
     {
         hasStarted = true;
-        VNManager.Instance.StartGame();
+        //VNManager.Instance.StartGame();
+        VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
         StopMenuMusic();
         ShowGamePanel();
     }

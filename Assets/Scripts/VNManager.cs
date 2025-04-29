@@ -141,10 +141,9 @@ public class VNManager : MonoBehaviour
         homeButton.onClick.AddListener(OnHomeButtonClick);
     }
 
-    public void StartGame()
+    public void StartGame(string fileName, int startLine)
     {
         InitializeAndLoadStory(defaultStoryFileName, defaultStartLine);
-
     }
 
     void InitializeAndLoadStory(string fileName, int lineNumber)
@@ -216,13 +215,16 @@ public class VNManager : MonoBehaviour
             if (storyData[currentLine].speakerName == Constants.END_OF_STORY)
             {
                 Debug.Log(Constants.END_OF_STORY);
-                return;
             }
             if (storyData[currentLine].speakerName == Constants.CHOICE)
             {
                 ShowChoices();
-                return;
             }
+            if (storyData[currentLine].speakerName == Constants.GOTO)
+            {
+                InitializeAndLoadStory(storyData[currentLine].speakingContent, defaultStartLine);
+            }
+            return;
         }
         if (typewriterEffect.IsTyping())
         {
@@ -303,15 +305,6 @@ public class VNManager : MonoBehaviour
         currentLine++;
     }
 
-    //void RecordHistory(string speaker, string content)
-    //{
-    //string historyRecord = speaker + Constants.COLON + content;
-    //if (historyRecords.Count >= Constants.MAX_LENGTH)
-    //{
-    //historyRecords.RemoveFirst(); // 移除队列头部元素
-    //}
-    //historyRecords.AddLast(historyRecord); // 添加队列尾部元素
-    //}
     void RecordHistory(string speaker, string content)
     {
         string historyRecord;
@@ -445,6 +438,7 @@ public class VNManager : MonoBehaviour
 
     void UpdateCharacterImage(string action, string imageFileName, Image characterImage, string x)
     {
+        // 根据Action执行对应的动画或操作
         if (action.StartsWith(Constants.APPEAR_AT)) // 解析appearAt(x,y)动作并在该位置显示立绘
         {
             string imagePath = Constants.CHARACTER_PATH + imageFileName;
@@ -453,7 +447,14 @@ public class VNManager : MonoBehaviour
                 UpdateImage(imagePath, characterImage);
                 var newPosition = new Vector2(float.Parse(x), characterImage.rectTransform.anchoredPosition.y);
                 characterImage.rectTransform.anchoredPosition = newPosition;
-                characterImage.DOFade(1, (isLoad ? 0 : Constants.DURATION_TIME)).From(0); // 淡出效果
+                //characterImage.DOFade(1, (isLoad ? 0 : Constants.DURATION_TIME)).From(0); // 淡出效果
+
+                var duration = Constants.DURATION_TIME;
+                if (isLoad || action == Constants.APPEAR_AT_INSTANTLY)
+                {
+                    duration = 0;
+                }
+                characterImage.DOFade(1, duration).From(0);
             }
             else
             {

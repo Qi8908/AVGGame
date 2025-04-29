@@ -8,9 +8,15 @@ public class Constants
     public static string EXCEL_FILE_EXTENSION = ".xlsx";
     public static int DEFAULT_START_LINE = 1;
 
-    // Choice
+    // Action
     public static string END_OF_STORY = "End of story";
     public static string CHOICE = "Choice";
+    public static string APPEAR_AT = "appearAt";
+    public static string APPEAR_AT_INSTANTLY = "appearAtInstantly";
+    public static string DISAPPEAR = "disappear";
+    public static string MOVE_TO = "moveTo";
+    public static string GOTO = "Goto";
+    public static int DURATION_TIME = 1;
 
     // TypewriterEffect
     public static float DEFAULT_TYPING_SECONDS = 0.05f; // 0.05f
@@ -37,12 +43,6 @@ public class Constants
     public static string SKIP_OFF = "skipOff";
     public static float SKIP_MODE_TYPING_SPEED = 0.02f;
     public static float DEFAULT_SKIP_WAITING_SECONDS = 0.05f;
-
-    // Action
-    public static string APPEAR_AT = "appearAt";
-    public static string DISAPPEAR = "disappear";
-    public static string MOVE_TO = "moveTo";
-    public static int DURATION_TIME = 1;
 
     // Save & Load
     public static int SAVE_SLOTS = 8;
