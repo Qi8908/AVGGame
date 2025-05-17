@@ -14,7 +14,6 @@ public class VNManager : MonoBehaviour
     public GameObject gamePanel;
     public GameObject dialogueBox;
     public TextMeshProUGUI speakerName;
-    //public TextMeshProUGUI speakingContent;
     public TypewriterEffect typewriterEffect;
     public ScreenShotter screenShotter;
 
@@ -25,6 +24,7 @@ public class VNManager : MonoBehaviour
     public GameObject speakerPanel;
     public Image characterImage1;
     public Image characterImage2;
+    public Image historyImage;
 
     public GameObject choicePanel;
     public Button choiceButton1;
@@ -172,6 +172,8 @@ public class VNManager : MonoBehaviour
         characterImage1.gameObject.SetActive(false);
         characterImage2.gameObject.SetActive(false);
 
+        historyImage.gameObject.SetActive(false);
+
         choicePanel.SetActive(false);
     }
 
@@ -300,6 +302,12 @@ public class VNManager : MonoBehaviour
         if (NotNullNorEmpty(data.character2Action))
         {
             UpdateCharacterImage(data.character2Action, data.character2ImageFileName, characterImage2, data.coordinateX2);
+        }
+
+        // History Image
+        if (NotNullNorEmpty(data.historyAction))
+        {
+            UpdateHistoryImage(data.historyAction, data.historyImageFileName, historyImage);
         }
 
         currentLine++;
@@ -447,7 +455,6 @@ public class VNManager : MonoBehaviour
                 UpdateImage(imagePath, characterImage);
                 var newPosition = new Vector2(float.Parse(x), characterImage.rectTransform.anchoredPosition.y);
                 characterImage.rectTransform.anchoredPosition = newPosition;
-                //characterImage.DOFade(1, (isLoad ? 0 : Constants.DURATION_TIME)).From(0); // 淡出效果
 
                 var duration = Constants.DURATION_TIME;
                 if (isLoad || action == Constants.APPEAR_AT_INSTANTLY)
@@ -476,6 +483,19 @@ public class VNManager : MonoBehaviour
             {
                 Debug.LogError(Constants.COORDINATE_MISSING);
             }
+        }
+    }
+
+    void UpdateHistoryImage(string action, string imageFileName, Image historyImage)
+    {
+        if (action.StartsWith(Constants.APPEAR_AT))
+        {
+            string imagePath = Constants.HISTORY_PATH + imageFileName;
+            UpdateImage(imagePath, historyImage);
+        }
+        else if (action == Constants.DISAPPEAR)
+        {
+            historyImage.gameObject.SetActive(false);
         }
     }
 

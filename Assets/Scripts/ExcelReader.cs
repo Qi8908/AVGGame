@@ -23,6 +23,8 @@ public class ExcelReader
         public string lastBackgroundMusic;
         public string lastCoordinateX1;
         public string lastCoordinateX2;
+        public string historyImageFileName;
+        public string historyAction;
     }
 
     public static List<ExcelData> ReadExcel(string filePath)
@@ -60,10 +62,15 @@ public class ExcelReader
                         data.coordinateX2 = reader.IsDBNull(10) ? string.Empty : reader.GetValue(10)?.ToString();
                         data.character2ImageFileName = reader.IsDBNull(11) ? string.Empty : reader.GetValue(11)?.ToString();
 
+                        // Last Data
                         data.lastBackgroundImage = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
                         data.lastBackgroundMusic = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
                         data.lastCoordinateX1 = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
                         data.lastCoordinateX2 = reader.IsDBNull(15) ? string.Empty : reader.GetValue(15)?.ToString();
+
+                        // History
+                        data.historyImageFileName = reader.IsDBNull(16) ? string.Empty : reader.GetValue(16)?.ToString();
+                        data.historyAction = reader.IsDBNull(17) ? string.Empty : reader.GetValue(17)?.ToString();
 
                         excelData.Add(data);
                     }

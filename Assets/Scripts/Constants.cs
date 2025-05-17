@@ -32,6 +32,9 @@ public class Constants
     // Character
     public static string CHARACTER_PATH = "Character/";
 
+    // History
+    public static string HISTORY_PATH = "History/";
+
     // AutoPlay
     public static string BUTTON_PATH = "Button/";
     public static string AUTO_ON = "autoPlayOn";
