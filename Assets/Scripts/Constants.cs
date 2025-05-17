@@ -51,14 +51,22 @@ public class Constants
     public static int SAVE_SLOTS = 8;
     public static int TOTAL_SLOTS = 8;
     public static string COLON = ": ";
-    public static string SAVE_GAME = "save_game";
-    public static string LOAD_GAME = "load_game";
-    public static string EMPTY_SLOT = "empty_slot";
+    public static string SAVE_GAME = "Save_Game";
+    public static string LOAD_GAME = "Load_Game";
+    public static string EMPTY_SLOT = "Empty_Slot";
     public static string SAVE_FILE_PATH = "saves";
     public static string SAVE_FILE_EXTENSION = ".json";
 
-    // History
+    // Gallery
     public static int MAX_LENGTH = 50;
+    public static int GALLERY_SLOTS_PER_PAGE = 9;
+    public static string GALLERY = "Knowledge_Gallery";
+    public static string GALLERY_PLACEHOLDER = "Gallery_Placeholder"; // 纯黑背景图占位
+    public static int DEFAULT_START_INDEX = 0;
+    public static readonly string[] ALL_HISTORY_IMAGES = { "History1", "History2", "History3", "History4", "History5", "History6", "History7", "History8", "History9", "History10", "History11", "History12", "History13", "History14", "History15", "History16", "History17", "History18" };
+    public static string UNLOCKED = "Unlocked";
+    public static string THUMBNAIL_PATH = "Thumbnail/";
+    public static string BIG_IMAGE_LOAD_FAILED = "Failed to load big image";
 
     // Error
     public static string AUDIO_LOAD_FAILED = "Failed to load audio";

@@ -11,7 +11,7 @@ public class MenuManager : MonoBehaviour
     public Button startButton;
     public Button continueButton;
     public Button loadButton;
-    public Button settingsButton;
+    public Button galleryButton;
     public Button quitButton;
 
     private bool hasStarted = false;
@@ -54,12 +54,12 @@ public class MenuManager : MonoBehaviour
         startButton.onClick.AddListener(StartGame);
         continueButton.onClick.AddListener(ContinueGame);
         loadButton.onClick.AddListener(LoadGame);
+        galleryButton.onClick.AddListener(ShowGalleryPanel);
     }
 
     private void StartGame()
     {
         hasStarted = true;
-        //VNManager.Instance.StartGame();
         VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
         StopMenuMusic();
         ShowGamePanel();
@@ -82,5 +82,10 @@ public class MenuManager : MonoBehaviour
     {
         menuPanel.SetActive(false);
         VNManager.Instance.gamePanel.SetActive(true);
+    }
+
+    private void ShowGalleryPanel()
+    {
+        GalleryManager.Instance.ShowGalleryPanel();
     }
 }

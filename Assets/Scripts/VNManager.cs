@@ -16,7 +16,6 @@ public class VNManager : MonoBehaviour
     public TextMeshProUGUI speakerName;
     public TypewriterEffect typewriterEffect;
     public ScreenShotter screenShotter;
-
     public Image avatarImage;
     public AudioSource vocalAudio;
     public Image backgroundImage;
@@ -61,10 +60,11 @@ public class VNManager : MonoBehaviour
 
     private Dictionary<string, int> globalMaxReachedLineIndices = new Dictionary<string, int>(); // 全局储存每个文件的最远行索引
     private LinkedList<string> historyRecords = new LinkedList<string>();
+    public HashSet<string> unlockedHistoryImage = new HashSet<string>(); // 保存已经解锁的历史图片
+    public static VNManager Instance { get; private set; }
     #endregion
 
     #region LifeCycle
-    public static VNManager Instance { get; private set; }
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -492,6 +492,11 @@ public class VNManager : MonoBehaviour
         {
             string imagePath = Constants.HISTORY_PATH + imageFileName;
             UpdateImage(imagePath, historyImage);
+            if (!unlockedHistoryImage.Contains(imageFileName))
+            {
+                unlockedHistoryImage.Add(imageFileName);
+                Debug.Log("历史知识图片已记录");
+            }
         }
         else if (action == Constants.DISAPPEAR)
         {
