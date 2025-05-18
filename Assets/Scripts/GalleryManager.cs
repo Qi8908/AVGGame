@@ -107,7 +107,7 @@ public class GalleryManager : MonoBehaviour
         }
 
         // 如果解锁了
-        string imagePath = Constants.HISTORY_PATH + historyName;
+        string imagePath = Constants.BIG_HISTORY_PATH + historyName;
         Sprite sprite = Resources.Load<Sprite>(imagePath);
         if (sprite != null)
         {

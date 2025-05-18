@@ -149,7 +149,8 @@ public class VNManager : MonoBehaviour
     void InitializeAndLoadStory(string fileName, int lineNumber)
     {
         Initialize(lineNumber);
-        LoadStoryFromFile(fileName);
+        //LoadStoryFromFile(fileName);
+        StartCoroutine(LoadStoryFromStreamingAssets(fileName));
         if (isLoad)
         {
             RecoverLastBackgroundAndCharacter();
@@ -177,15 +178,59 @@ public class VNManager : MonoBehaviour
         choicePanel.SetActive(false);
     }
 
-    void LoadStoryFromFile(string fileName)
+    //void LoadStoryFromFile(string fileName)
+    //{
+    //currentStoryFileName = fileName;
+    //var path = storyPath + fileName + excelFileExtension;
+    //storyData = ExcelReader.ReadExcel(path);
+    //if (storyData == null || storyData.Count == 0)
+    //{
+    //Debug.LogError(Constants.NO_DATA_FOUND);
+    //}
+    //if (globalMaxReachedLineIndices.ContainsKey(currentStoryFileName))
+    //{
+    //maxReachedLineIndex = globalMaxReachedLineIndices[currentStoryFileName];
+    //}
+    //else
+    //{
+    //maxReachedLineIndex = 0;
+    //globalMaxReachedLineIndices[currentStoryFileName] = maxReachedLineIndex;
+    //}
+    //}
+
+    IEnumerator LoadStoryFromStreamingAssets(string fileName)
     {
         currentStoryFileName = fileName;
-        var path = storyPath + fileName + excelFileExtension;
+        string path = Path.Combine(Application.streamingAssetsPath, fileName + excelFileExtension);
+        string tempPath = Path.Combine(Application.persistentDataPath, fileName + excelFileExtension);
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+    byte[] fileData;
+    UnityWebRequest www = UnityWebRequest.Get(path);
+    yield return www.SendWebRequest();
+    if (www.result != UnityWebRequest.Result.Success)
+    {
+        Debug.LogError("Failed to load Excel file: " + www.error);
+        yield break;
+    }
+    fileData = www.downloadHandler.data;
+    File.WriteAllBytes(tempPath, fileData);
+    storyData = ExcelReader.ReadExcel(tempPath);
+#else
+        if (!File.Exists(path))
+        {
+            Debug.LogError("Excel file not found: " + path);
+            yield break;
+        }
         storyData = ExcelReader.ReadExcel(path);
+#endif
+
         if (storyData == null || storyData.Count == 0)
         {
             Debug.LogError(Constants.NO_DATA_FOUND);
+            yield break;
         }
+
         if (globalMaxReachedLineIndices.ContainsKey(currentStoryFileName))
         {
             maxReachedLineIndex = globalMaxReachedLineIndices[currentStoryFileName];
@@ -195,7 +240,17 @@ public class VNManager : MonoBehaviour
             maxReachedLineIndex = 0;
             globalMaxReachedLineIndices[currentStoryFileName] = maxReachedLineIndex;
         }
+
+        if (isLoad)
+        {
+            RecoverLastBackgroundAndCharacter();
+            isLoad = false;
+        }
+
+        DisplayNextLine();
+        typewriterEffect.onTypingComplete = StopVocalAudio;
     }
+
     #endregion
 
     #region Display

@@ -66,6 +66,7 @@ public class Constants
     public static readonly string[] ALL_HISTORY_IMAGES = { "History1", "History2", "History3", "History4", "History5", "History6", "History7", "History8", "History9", "History10", "History11", "History12", "History13", "History14", "History15", "History16" };
     public static string UNLOCKED = "Unlocked";
     public static string THUMBNAIL_PATH = "Thumbnail/";
+    public static string BIG_HISTORY_PATH = "BigHistory/";
     public static string BIG_IMAGE_LOAD_FAILED = "Failed to load big image";
 
     // Error
