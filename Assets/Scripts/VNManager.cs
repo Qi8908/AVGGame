@@ -727,6 +727,7 @@ public class VNManager : MonoBehaviour
             var saveData = JsonConvert.DeserializeObject<SaveData>(json);
             historyRecords = saveData.savedHistoryRecords;
             historyRecords.RemoveLast(); // 加载存档时移除最后一条历史记录
+            MenuManager.Instance.StopMenuMusic();
             var lineNumber = saveData.savedLine - 1;
             InitializeAndLoadStory(saveData.savedStoryFileName, lineNumber);
         }
