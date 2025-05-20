@@ -29,6 +29,7 @@ public class VNManager : MonoBehaviour
     public Button choiceButton1;
     public Button choiceButton2;
 
+    public GameObject mapPanel;
     public GameObject bottomButtons;
     public Button autoButton;
     public Button skipButton;
@@ -36,7 +37,7 @@ public class VNManager : MonoBehaviour
     public Button saveButton;
     public Button loadButton;
     public Button historyButton;
-    public Button settingsButton;
+    public Button mapButton;
     public Button homeButton;
 
     private readonly string storyPath = Constants.STORY_PATH;
@@ -78,9 +79,9 @@ public class VNManager : MonoBehaviour
     void Start()
     {
         InitializeSaveFilePath();
-
         BottomButtonsAddListener();
         TopButtonsAddListener();
+        //mapPanel.SetActive(false);
     }
 
     void Update()
@@ -138,6 +139,7 @@ public class VNManager : MonoBehaviour
         saveButton.onClick.AddListener(OnSaveButtonClick);
         loadButton.onClick.AddListener(OnLoadButtonClick);
         historyButton.onClick.AddListener(OnHistoryButtonClick);
+        mapButton.onClick.AddListener(OnMapButtonClick);
         homeButton.onClick.AddListener(OnHomeButtonClick);
     }
 
@@ -762,6 +764,13 @@ public class VNManager : MonoBehaviour
         bottomButtons.SetActive(false);
         topButtons.SetActive(false);
         HistoryManager.Instance.ShowHistory(historyRecords);
+    }
+    #endregion
+
+    #region Map
+    void OnMapButtonClick()
+    {
+        MapManager.Instance.ShowMap();
     }
     #endregion
     #endregion
