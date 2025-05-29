@@ -91,7 +91,6 @@ public class GalleryManager : MonoBehaviour
             Debug.LogError(Constants.IMAGE_LOAD_FAILED + imagePath);
         }
 
-        Debug.Log("更新画廊");
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => OnButtonClick(button, index));
     }

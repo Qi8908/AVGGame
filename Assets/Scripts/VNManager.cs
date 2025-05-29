@@ -370,17 +370,38 @@ public class VNManager : MonoBehaviour
         currentLine++;
     }
 
+    // void RecordHistory(string speaker, string content)
+    // {
+    //     string historyRecord;
+
+    //     if (!string.IsNullOrEmpty(speaker))
+    //     {
+    //         historyRecord = speaker + Constants.COLON + content; // 有角色名，加冒号
+    //     }
+    //     else
+    //     {
+    //         historyRecord = content; // 没有角色名（旁白），直接用内容
+    //     }
+
+    //     if (historyRecords.Count >= Constants.MAX_LENGTH)
+    //     {
+    //         historyRecords.RemoveFirst();
+    //     }
+    //     historyRecords.AddLast(historyRecord);
+    // }
+
     void RecordHistory(string speaker, string content)
     {
-        string historyRecord;
+        string cleanContent = RemoveColorTags(content);
 
+        string historyRecord;
         if (!string.IsNullOrEmpty(speaker))
         {
-            historyRecord = speaker + Constants.COLON + content; // 有角色名，加冒号
+            historyRecord = speaker + Constants.COLON + cleanContent;
         }
         else
         {
-            historyRecord = content; // 没有角色名（旁白），直接用内容
+            historyRecord = cleanContent;
         }
 
         if (historyRecords.Count >= Constants.MAX_LENGTH)
@@ -389,6 +410,12 @@ public class VNManager : MonoBehaviour
         }
         historyRecords.AddLast(historyRecord);
     }
+
+    string RemoveColorTags(string input)
+    {
+        return System.Text.RegularExpressions.Regex.Replace(input, @"<color=.*?>|</color>", "");
+    }
+
 
 
     void RecoverLastBackgroundAndCharacter()
