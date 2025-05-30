@@ -416,8 +416,6 @@ public class VNManager : MonoBehaviour
         return System.Text.RegularExpressions.Regex.Replace(input, @"<color=.*?>|</color>", "");
     }
 
-
-
     void RecoverLastBackgroundAndCharacter()
     {
         var data = storyData[currentLine];
