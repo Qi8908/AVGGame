@@ -26,8 +26,8 @@ public class VNManager : MonoBehaviour
     public Image historyImage;
 
     public GameObject choicePanel;
-    public Button choiceButton1;
-    public Button choiceButton2;
+    public Button choiceButtonPrefab;
+    private List<Button> currentChoiceButtons = new List<Button>();
 
     public GameObject mapPanel;
     public GameObject bottomButtons;
@@ -258,33 +258,46 @@ public class VNManager : MonoBehaviour
     #region Display
     void DisplayNextLine()
     {
+        // 防止越界
+        if (currentLine >= storyData.Count)
+            return;
+
+        var data = storyData[currentLine];
+
+        // 更新最大到达行
         if (currentLine > maxReachedLineIndex)
         {
             maxReachedLineIndex = currentLine;
             globalMaxReachedLineIndices[currentStoryFileName] = maxReachedLineIndex;
         }
 
-        if (currentLine >= storyData.Count - 1)
+        // 判断特殊类型行
+        if (data.speakerName == Constants.END_OF_STORY)
         {
-            if (isAutoPlay)
-            {
-                isAutoPlay = false;
-                UpdateButtonImage(Constants.AUTO_OFF, autoButton);
-            }
-            if (storyData[currentLine].speakerName == Constants.END_OF_STORY)
-            {
-                Debug.Log(Constants.END_OF_STORY);
-            }
-            if (storyData[currentLine].speakerName == Constants.CHOICE)
-            {
-                ShowChoices();
-            }
-            if (storyData[currentLine].speakerName == Constants.GOTO)
-            {
-                InitializeAndLoadStory(storyData[currentLine].speakingContent, defaultStartLine);
-            }
+            Debug.Log(Constants.END_OF_STORY);
             return;
         }
+
+        if (data.speakerName == Constants.CHOICE)
+        {
+            ShowChoices();
+            return;
+        }
+
+        if (data.speakerName == Constants.GOTO)
+        {
+            InitializeAndLoadStory(data.speakingContent, defaultStartLine);
+            return;
+        }
+
+        // 自动播放关闭逻辑（如果刚好到末尾）
+        if (currentLine == storyData.Count - 1 && isAutoPlay)
+        {
+            isAutoPlay = false;
+            UpdateButtonImage(Constants.AUTO_OFF, autoButton);
+        }
+
+        // 打字机中 → 快进；否则 → 显示下一行
         if (typewriterEffect.IsTyping())
         {
             typewriterEffect.CompleteLine();
@@ -296,6 +309,7 @@ public class VNManager : MonoBehaviour
         }
     }
 
+
     void DisplayThisLine()
     {
         var data = storyData[currentLine];
@@ -305,8 +319,8 @@ public class VNManager : MonoBehaviour
 
         RecordHistory(speakerName.text, currentSpeakingContent); // 记录历史文本
 
-        // Avatar
-        if (NotNullNorEmpty(data.avatarImageFileName))
+        // Avatar - 避免选项分支时加载不存在的头像资源
+        if (NotNullNorEmpty(data.avatarImageFileName) && data.speakerName != Constants.CHOICE)
         {
             UpdateAvatarImage(data.avatarImageFileName);
         }
@@ -446,19 +460,63 @@ public class VNManager : MonoBehaviour
     #region Choices
     void ShowChoices()
     {
-        var data = storyData[currentLine];
-
-        choiceButton1.onClick.RemoveAllListeners();
-        choiceButton2.onClick.RemoveAllListeners();
+        // 清除旧按钮
+        foreach (var button in currentChoiceButtons)
+        {
+            Destroy(button.gameObject);
+        }
+        currentChoiceButtons.Clear();
 
         choicePanel.SetActive(true);
 
-        choiceButton1.GetComponentInChildren<TextMeshProUGUI>().text = data.speakingContent; // 选项1文本
-        choiceButton1.onClick.AddListener(() => InitializeAndLoadStory(data.avatarImageFileName, defaultStartLine)); // 选项1跳转文件
+        // 从当前行开始，逐行读取所有选项（直到遇到下一行不是空的或文件结束）
+        List<string> choiceTexts = new List<string>();
+        List<string> jumpFiles = new List<string>();
 
-        choiceButton2.GetComponentInChildren<TextMeshProUGUI>().text = data.vocalAudioFileName; // 选项2文本
-        choiceButton2.onClick.AddListener(() => InitializeAndLoadStory(data.backgroundImageFileName, defaultStartLine)); // 选项2跳转文件
+        int lineIndex = currentLine;
+        while (lineIndex < storyData.Count)
+        {
+            var data = storyData[lineIndex];
+
+            // 第一行必须是 "Choice"
+            if (lineIndex == currentLine && data.speakerName != Constants.CHOICE)
+            {
+                Debug.LogError("Expected 'Choice' marker but got: " + data.speakerName);
+                return;
+            }
+
+            // 后续行为选项内容，直到 Name 列不为空或读完
+            if (lineIndex > currentLine && !string.IsNullOrEmpty(data.speakerName))
+            {
+                break;
+            }
+
+            if (!string.IsNullOrEmpty(data.speakingContent) && !string.IsNullOrEmpty(data.avatarImageFileName))
+            {
+                choiceTexts.Add(data.speakingContent);
+                jumpFiles.Add(data.avatarImageFileName);
+            }
+
+            lineIndex++;
+        }
+
+        // 跳过所有选项行
+        currentLine = lineIndex;
+
+        for (int i = 0; i < choiceTexts.Count; i++)
+        {
+            int choiceIndex = i;
+            Button newButton = Instantiate(choiceButtonPrefab, choicePanel.transform);
+            newButton.GetComponentInChildren<TextMeshProUGUI>().text = choiceTexts[i];
+            newButton.onClick.AddListener(() =>
+            {
+                InitializeAndLoadStory(jumpFiles[choiceIndex], Constants.DEFAULT_START_LINE);
+            });
+            currentChoiceButtons.Add(newButton);
+        }
     }
+
+
     #endregion
 
     #region Audios

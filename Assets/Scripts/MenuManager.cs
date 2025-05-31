@@ -55,6 +55,7 @@ public class MenuManager : MonoBehaviour
         continueButton.onClick.AddListener(ContinueGame);
         loadButton.onClick.AddListener(LoadGame);
         galleryButton.onClick.AddListener(ShowGalleryPanel);
+        quitButton.onClick.AddListener(QuitGame);
     }
 
     private void StartGame()
@@ -87,5 +88,16 @@ public class MenuManager : MonoBehaviour
     private void ShowGalleryPanel()
     {
         GalleryManager.Instance.ShowGalleryPanel();
+    }
+
+    private void QuitGame()
+    {
+        Debug.Log("Quitting game...");
+        Application.Quit();
+
+#if UNITY_EDITOR
+        // 如果在 Unity 编辑器里运行，则停止播放
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
