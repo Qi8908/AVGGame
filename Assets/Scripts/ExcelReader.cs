@@ -25,6 +25,9 @@ public class ExcelReader
         public string lastCoordinateX2;
         public string historyImageFileName;
         public string historyAction;
+        public string soundEffectFileName;
+        public string seAction;
+
     }
 
     public static List<ExcelData> ReadExcel(string filePath)
@@ -71,6 +74,10 @@ public class ExcelReader
                         // History
                         data.historyImageFileName = reader.IsDBNull(16) ? string.Empty : reader.GetValue(16)?.ToString();
                         data.historyAction = reader.IsDBNull(17) ? string.Empty : reader.GetValue(17)?.ToString();
+
+                        // SoundEffect
+                        data.soundEffectFileName = reader.IsDBNull(18) ? string.Empty : reader.GetValue(18)?.ToString();
+                        data.seAction = reader.IsDBNull(19) ? string.Empty : reader.GetValue(19)?.ToString();
 
                         excelData.Add(data);
                     }

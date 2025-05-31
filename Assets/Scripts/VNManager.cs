@@ -24,6 +24,7 @@ public class VNManager : MonoBehaviour
     public Image characterImage1;
     public Image characterImage2;
     public Image historyImage;
+    public AudioSource soundEffect;
 
     public GameObject choicePanel;
     public Button choiceButtonPrefab;
@@ -81,7 +82,6 @@ public class VNManager : MonoBehaviour
         InitializeSaveFilePath();
         BottomButtonsAddListener();
         TopButtonsAddListener();
-        //mapPanel.SetActive(false);
     }
 
     void Update()
@@ -179,26 +179,6 @@ public class VNManager : MonoBehaviour
 
         choicePanel.SetActive(false);
     }
-
-    //void LoadStoryFromFile(string fileName)
-    //{
-    //currentStoryFileName = fileName;
-    //var path = storyPath + fileName + excelFileExtension;
-    //storyData = ExcelReader.ReadExcel(path);
-    //if (storyData == null || storyData.Count == 0)
-    //{
-    //Debug.LogError(Constants.NO_DATA_FOUND);
-    //}
-    //if (globalMaxReachedLineIndices.ContainsKey(currentStoryFileName))
-    //{
-    //maxReachedLineIndex = globalMaxReachedLineIndices[currentStoryFileName];
-    //}
-    //else
-    //{
-    //maxReachedLineIndex = 0;
-    //globalMaxReachedLineIndices[currentStoryFileName] = maxReachedLineIndex;
-    //}
-    //}
 
     IEnumerator LoadStoryFromStreamingAssets(string fileName)
     {
@@ -381,28 +361,15 @@ public class VNManager : MonoBehaviour
             UpdateHistoryImage(data.historyAction, data.historyImageFileName, historyImage);
         }
 
+        // SoundEffect
+        if (NotNullNorEmpty(data.seAction))
+        {
+            UpdateSoundEffect(data.seAction, data.soundEffectFileName);
+        }
+
+
         currentLine++;
     }
-
-    // void RecordHistory(string speaker, string content)
-    // {
-    //     string historyRecord;
-
-    //     if (!string.IsNullOrEmpty(speaker))
-    //     {
-    //         historyRecord = speaker + Constants.COLON + content; // 有角色名，加冒号
-    //     }
-    //     else
-    //     {
-    //         historyRecord = content; // 没有角色名（旁白），直接用内容
-    //     }
-
-    //     if (historyRecords.Count >= Constants.MAX_LENGTH)
-    //     {
-    //         historyRecords.RemoveFirst();
-    //     }
-    //     historyRecords.AddLast(historyRecord);
-    // }
 
     void RecordHistory(string speaker, string content)
     {
@@ -555,6 +522,23 @@ public class VNManager : MonoBehaviour
         string musicPath = Constants.MUSIC_PATH + musicFileName;
         PlayAudio(musicPath, backgroundMusic, true);
     }
+
+    void UpdateSoundEffect(string action, string soundFileName)
+    {
+        if (action == Constants.APPEAR_AT) // 播放音效
+        {
+            string path = Constants.SOUND_EFFECT_PATH + soundFileName;
+            PlayAudio(path, soundEffect, false); // 不循环
+        }
+        else if (action == Constants.DISAPPEAR || action == Constants.DISAPPEAR) // 停止播放
+        {
+            if (soundEffect.isPlaying)
+            {
+                soundEffect.Stop();
+            }
+        }
+    }
+
     #endregion
 
     #region Images

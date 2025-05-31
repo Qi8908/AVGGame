@@ -28,6 +28,7 @@ public class Constants
     // Background
     public static string BACKGROUND_PATH = "Background/";
     public static string MUSIC_PATH = "Audio/BGM/";
+    public static string SOUND_EFFECT_PATH = "Audio/SoundEffect/";
 
     // Character
     public static string CHARACTER_PATH = "Character/";

@@ -128,14 +128,27 @@ public class SaveLoadManager : MonoBehaviour
             }
             if (saveData.savedSpeakingContent != null)
             {
+                // var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
+
+                // string shortContent = saveData.savedSpeakingContent.Length > 20
+                //                         ? saveData.savedSpeakingContent.Substring(0, 20) + "..."
+                //                         : saveData.savedSpeakingContent;
+
+                // textComponents[0].text = shortContent;
+                // textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G"); // G 表示不同的时间格式
                 var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
 
-                string shortContent = saveData.savedSpeakingContent.Length > 20
-                                        ? saveData.savedSpeakingContent.Substring(0, 20) + "..."
-                                        : saveData.savedSpeakingContent;
+                string cleanedContent = System.Text.RegularExpressions.Regex.Replace(
+                    saveData.savedSpeakingContent,
+                    @"<color=.*?>|</color>",
+                    ""
+                );
+                string shortContent = cleanedContent.Length > 27
+                                        ? cleanedContent.Substring(0, 27) + "..."
+                                        : cleanedContent;
 
                 textComponents[0].text = shortContent;
-                textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G"); // G 表示不同的时间格式
+                textComponents[1].text = File.GetLastWriteTime(savePath).ToString("G");
             }
         }
     }
