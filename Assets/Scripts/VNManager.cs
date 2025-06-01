@@ -20,6 +20,7 @@ public class VNManager : MonoBehaviour
     public AudioSource vocalAudio;
     public Image backgroundImage;
     public AudioSource backgroundMusic;
+    private string currentBackgroundMusicName = "";
     public GameObject speakerPanel;
     public Image characterImage1;
     public Image characterImage2;
@@ -340,9 +341,18 @@ public class VNManager : MonoBehaviour
         }
 
         // BGM
-        if (NotNullNorEmpty(data.backgroundMusicFileName))
+        // if (NotNullNorEmpty(data.backgroundMusicFileName))
+        // {
+        //     PlayBackgroundMusic(data.backgroundMusicFileName);
+        // }
+        if (!string.IsNullOrEmpty(data.backgroundMusicFileName))
         {
-            PlayBackgroundMusic(data.backgroundMusicFileName);
+            currentBackgroundMusicName = data.backgroundMusicFileName;
+            PlayBackgroundMusic(currentBackgroundMusicName);
+        }
+        else if (!string.IsNullOrEmpty(currentBackgroundMusicName) && !backgroundMusic.isPlaying)
+        {
+            PlayBackgroundMusic(currentBackgroundMusicName);
         }
 
         // Character Action
@@ -523,11 +533,11 @@ public class VNManager : MonoBehaviour
         PlayAudio(musicPath, backgroundMusic, true);
     }
 
-    void UpdateSoundEffect(string action, string soundFileName)
+    void UpdateSoundEffect(string action, string soundEffectFileName)
     {
         if (action == Constants.APPEAR_AT) // 播放音效
         {
-            string path = Constants.SOUND_EFFECT_PATH + soundFileName;
+            string path = Constants.SOUND_EFFECT_PATH + soundEffectFileName;
             PlayAudio(path, soundEffect, false); // 不循环
         }
         else if (action == Constants.DISAPPEAR || action == Constants.DISAPPEAR) // 停止播放
@@ -751,6 +761,7 @@ public class VNManager : MonoBehaviour
         public string savedSpeakingContent;
         public byte[] screenShotData;
         public LinkedList<string> savedHistoryRecords;
+        public string savedBGM; //
     }
     void OnSaveButtonClick()
     {
@@ -769,7 +780,8 @@ public class VNManager : MonoBehaviour
             savedLine = currentLine,
             savedSpeakingContent = currentSpeakingContent,
             screenShotData = screenShotData,
-            savedHistoryRecords = historyRecords // 历史记录也要跟随每个存档
+            savedHistoryRecords = historyRecords, // 历史记录也要跟随每个存档
+            savedBGM = currentBackgroundMusicName
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
         string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -796,6 +808,7 @@ public class VNManager : MonoBehaviour
             var saveData = JsonConvert.DeserializeObject<SaveData>(json);
             historyRecords = saveData.savedHistoryRecords;
             historyRecords.RemoveLast(); // 加载存档时移除最后一条历史记录
+            currentBackgroundMusicName = saveData.savedBGM;
             MenuManager.Instance.StopMenuMusic();
             var lineNumber = saveData.savedLine - 1;
             InitializeAndLoadStory(saveData.savedStoryFileName, lineNumber);

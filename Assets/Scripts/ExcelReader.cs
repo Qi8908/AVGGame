@@ -66,18 +66,18 @@ public class ExcelReader
                         data.character2ImageFileName = reader.IsDBNull(11) ? string.Empty : reader.GetValue(11)?.ToString();
 
                         // Last Data
-                        data.lastBackgroundImage = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
-                        data.lastBackgroundMusic = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
-                        data.lastCoordinateX1 = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
-                        data.lastCoordinateX2 = reader.IsDBNull(15) ? string.Empty : reader.GetValue(15)?.ToString();
+                        // data.lastBackgroundImage = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
+                        // data.lastBackgroundMusic = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
+                        // data.lastCoordinateX1 = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
+                        // data.lastCoordinateX2 = reader.IsDBNull(15) ? string.Empty : reader.GetValue(15)?.ToString();
 
                         // History
-                        data.historyImageFileName = reader.IsDBNull(16) ? string.Empty : reader.GetValue(16)?.ToString();
-                        data.historyAction = reader.IsDBNull(17) ? string.Empty : reader.GetValue(17)?.ToString();
+                        data.historyImageFileName = reader.IsDBNull(12) ? string.Empty : reader.GetValue(12)?.ToString();
+                        data.historyAction = reader.IsDBNull(13) ? string.Empty : reader.GetValue(13)?.ToString();
 
                         // SoundEffect
-                        data.soundEffectFileName = reader.IsDBNull(18) ? string.Empty : reader.GetValue(18)?.ToString();
-                        data.seAction = reader.IsDBNull(19) ? string.Empty : reader.GetValue(19)?.ToString();
+                        data.soundEffectFileName = reader.IsDBNull(14) ? string.Empty : reader.GetValue(14)?.ToString();
+                        data.seAction = reader.IsDBNull(15) ? string.Empty : reader.GetValue(15)?.ToString();
 
                         excelData.Add(data);
                     }
