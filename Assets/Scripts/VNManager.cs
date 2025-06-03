@@ -32,6 +32,7 @@ public class VNManager : MonoBehaviour
     private List<Button> currentChoiceButtons = new List<Button>();
 
     public GameObject mapPanel;
+    public GameObject suspectPanel;
     public GameObject bottomButtons;
     public Button autoButton;
     public Button skipButton;
@@ -40,6 +41,7 @@ public class VNManager : MonoBehaviour
     public Button loadButton;
     public Button historyButton;
     public Button mapButton;
+    public Button suspectButton;
     public Button homeButton;
 
     private readonly string storyPath = Constants.STORY_PATH;
@@ -141,6 +143,7 @@ public class VNManager : MonoBehaviour
         loadButton.onClick.AddListener(OnLoadButtonClick);
         historyButton.onClick.AddListener(OnHistoryButtonClick);
         mapButton.onClick.AddListener(OnMapButtonClick);
+        suspectButton.onClick.AddListener(OnSuspectButtonClick);
         homeButton.onClick.AddListener(OnHomeButtonClick);
     }
 
@@ -851,6 +854,17 @@ public class VNManager : MonoBehaviour
     void OnMapButtonClick()
     {
         MapManager.Instance.ShowMap();
+    }
+    #endregion
+
+    #region Suspect
+
+    void OnSuspectButtonClick()
+    {
+        Debug.Log("OnSuspectButtonClick方法触发了");
+        bottomButtons.SetActive(false);
+        topButtons.SetActive(false);
+        SuspectManager.Instance.ShowSuspect();
     }
     #endregion
     #endregion

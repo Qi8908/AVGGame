@@ -13,6 +13,7 @@ public class MenuManager : MonoBehaviour
     public Button loadButton;
     public Button galleryButton;
     public Button quitButton;
+    public GameObject guidePanel;
 
     private bool hasStarted = false;
     public static MenuManager Instance { get; private set; }
@@ -26,6 +27,12 @@ public class MenuManager : MonoBehaviour
         }
         Instance = this;
 
+        InitializeAudio();
+        guidePanel.SetActive(false);
+    }
+
+    void InitializeAudio()
+    {
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.clip = menuMusicClip;
         audioSource.loop = true;
@@ -60,7 +67,19 @@ public class MenuManager : MonoBehaviour
 
     private void StartGame()
     {
+        // hasStarted = true;
+        // VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
+        // StopMenuMusic();
+        // ShowGamePanel();
+        guidePanel.SetActive(true); // 先显示引导图
+        startButton.interactable = false;
+        menuPanel.SetActive(true);
+    }
+
+    public void OnGuidePanelClicked()
+    {
         hasStarted = true;
+        guidePanel.SetActive(false); // 隐藏引导图
         VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
         StopMenuMusic();
         ShowGamePanel();
