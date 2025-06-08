@@ -17,6 +17,7 @@ public class Constants
     public static string MOVE_TO = "moveTo";
     public static string GOTO = "Goto";
     public static int DURATION_TIME = 1;
+    public static string INVESTIGATE = "Investigate"; // R 
 
     // TypewriterEffect
     public static float DEFAULT_TYPING_SECONDS = 0.05f; // 0.05f

@@ -31,6 +31,9 @@ public class VNManager : MonoBehaviour
     public Button choiceButtonPrefab;
     private List<Button> currentChoiceButtons = new List<Button>();
 
+    public GameObject investigatePanel; // R
+    public Button[] investigationButtons;
+
     public GameObject mapPanel;
     public GameObject suspectPanel;
     public GameObject bottomButtons;
@@ -182,6 +185,8 @@ public class VNManager : MonoBehaviour
         historyImage.gameObject.SetActive(false);
 
         choicePanel.SetActive(false);
+
+        investigatePanel.SetActive(false); // R
     }
 
     IEnumerator LoadStoryFromStreamingAssets(string fileName)
@@ -247,6 +252,7 @@ public class VNManager : MonoBehaviour
             return;
 
         var data = storyData[currentLine];
+        Debug.Log("Line " + currentLine + " speakerName: [" + data.speakerName + "]");
 
         // 更新最大到达行
         if (currentLine > maxReachedLineIndex)
@@ -274,6 +280,12 @@ public class VNManager : MonoBehaviour
             return;
         }
 
+        if (data.speakerName == Constants.INVESTIGATE) // R
+        {
+            ShowInvestigation();
+            return;
+        }
+
         // 自动播放关闭逻辑（如果刚好到末尾）
         if (currentLine == storyData.Count - 1 && isAutoPlay)
         {
@@ -292,7 +304,6 @@ public class VNManager : MonoBehaviour
             DisplayThisLine();
         }
     }
-
 
     void DisplayThisLine()
     {
@@ -344,10 +355,6 @@ public class VNManager : MonoBehaviour
         }
 
         // BGM
-        // if (NotNullNorEmpty(data.backgroundMusicFileName))
-        // {
-        //     PlayBackgroundMusic(data.backgroundMusicFileName);
-        // }
         if (!string.IsNullOrEmpty(data.backgroundMusicFileName))
         {
             currentBackgroundMusicName = data.backgroundMusicFileName;
@@ -379,8 +386,6 @@ public class VNManager : MonoBehaviour
         {
             UpdateSoundEffect(data.seAction, data.soundEffectFileName);
         }
-
-
         currentLine++;
     }
 
@@ -493,6 +498,76 @@ public class VNManager : MonoBehaviour
                 InitializeAndLoadStory(jumpFiles[choiceIndex], Constants.DEFAULT_START_LINE);
             });
             currentChoiceButtons.Add(newButton);
+        }
+    }
+
+    void ShowInvestigation()
+    {
+        Debug.Log("ShowInvestigation 被调用了");
+
+        List<string> buttonTexts = new List<string>();
+        List<string> jumpTargets = new List<string>();
+
+        int lineIndex = currentLine;
+        while (lineIndex < storyData.Count)
+        {
+            var data = storyData[lineIndex];
+
+            Debug.Log($"Reading line {lineIndex}: speakerName = [{data.speakerName}], content = [{data.speakingContent}], jump = [{data.avatarImageFileName}]");
+
+            if (lineIndex == currentLine && data.speakerName != "Investigate")
+            {
+                Debug.LogError("Expected 'Investigate' marker but got: " + data.speakerName);
+                return;
+            }
+
+            if (lineIndex > currentLine && !string.IsNullOrEmpty(data.speakerName))
+            {
+                break;
+            }
+
+            if (!string.IsNullOrEmpty(data.speakingContent) && !string.IsNullOrEmpty(data.avatarImageFileName))
+            {
+                buttonTexts.Add(data.speakingContent);
+                jumpTargets.Add(data.avatarImageFileName);
+            }
+
+            lineIndex++;
+        }
+
+        currentLine = lineIndex;
+
+        Debug.Log($"准备显示 {buttonTexts.Count} 个调查按钮");
+
+        for (int i = 0; i < investigationButtons.Length; i++)
+        {
+            if (i < buttonTexts.Count)
+            {
+                investigationButtons[i].gameObject.SetActive(true);
+                int index = i;
+                investigationButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = buttonTexts[i];
+                investigationButtons[i].onClick.RemoveAllListeners();
+                investigationButtons[i].onClick.AddListener(() =>
+                {
+                    Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
+                    InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
+                });
+            }
+            else
+            {
+                investigationButtons[i].gameObject.SetActive(false);
+            }
+        }
+
+        // ✅ 显式激活面板（如果没激活）
+        if (investigatePanel != null)
+        {
+            investigatePanel.SetActive(true);
+            Debug.Log("investigatePanel.SetActive(true)");
+        }
+        else
+        {
+            Debug.LogError("investigatePanel 未绑定");
         }
     }
 
@@ -649,6 +724,7 @@ public class VNManager : MonoBehaviour
     #endregion
 
     #region Buttons
+
     #region Top & Bottom
     bool IsHittingBottomButtons()
     {
@@ -668,6 +744,7 @@ public class VNManager : MonoBehaviour
         );
     }
     #endregion
+
     #region Auto
     void OnAutoButtonClick()
     {
@@ -691,6 +768,7 @@ public class VNManager : MonoBehaviour
         }
     }
     #endregion
+
     #region Skip
     void OnSkipButtonClick()
     {
@@ -756,6 +834,7 @@ public class VNManager : MonoBehaviour
         }
     }
     #endregion
+
     #region Save & Load
     public class SaveData
     {
@@ -818,6 +897,7 @@ public class VNManager : MonoBehaviour
         }
     }
     #endregion
+
     #region Home
     void OnHomeButtonClick()
     {
@@ -826,6 +906,7 @@ public class VNManager : MonoBehaviour
     }
 
     #endregion
+
     #region OpenUI & CloseUI
     void OpenUI()
     {
@@ -840,7 +921,8 @@ public class VNManager : MonoBehaviour
         bottomButtons.SetActive(false);
         topButtons.SetActive(false);
     }
-    #endregion 
+    #endregion
+
     #region History
     void OnHistoryButtonClick()
     {
