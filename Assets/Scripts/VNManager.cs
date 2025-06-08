@@ -33,6 +33,8 @@ public class VNManager : MonoBehaviour
 
     public GameObject investigatePanel; // R
     public Button[] investigationButtons;
+    public GameObject investigatePanel2;
+    public Button[] investigationButtons2;
 
     public GameObject mapPanel;
     public GameObject suspectPanel;
@@ -187,6 +189,7 @@ public class VNManager : MonoBehaviour
         choicePanel.SetActive(false);
 
         investigatePanel.SetActive(false); // R
+        investigatePanel2.SetActive(false); // R
     }
 
     IEnumerator LoadStoryFromStreamingAssets(string fileName)
@@ -283,6 +286,11 @@ public class VNManager : MonoBehaviour
         if (data.speakerName == Constants.INVESTIGATE) // R
         {
             ShowInvestigation();
+            return;
+        }
+        if (data.speakerName == Constants.INVESTIGATE2)
+        {
+            ShowInvestigation2();
             return;
         }
 
@@ -568,6 +576,76 @@ public class VNManager : MonoBehaviour
         else
         {
             Debug.LogError("investigatePanel 未绑定");
+        }
+    }
+
+    void ShowInvestigation2()
+    {
+        Debug.Log("ShowInvestigate2 被调用了");
+
+        List<string> buttonTexts = new List<string>();
+        List<string> jumpTargets = new List<string>();
+
+        int lineIndex = currentLine;
+        while (lineIndex < storyData.Count)
+        {
+            var data = storyData[lineIndex];
+
+            Debug.Log($"Reading line {lineIndex}: speakerName = [{data.speakerName}], content = [{data.speakingContent}], jump = [{data.avatarImageFileName}]");
+
+            if (lineIndex == currentLine && data.speakerName != "Investigate2")
+            {
+                Debug.LogError("Expected 'Investigate' marker but got: " + data.speakerName);
+                return;
+            }
+
+            if (lineIndex > currentLine && !string.IsNullOrEmpty(data.speakerName))
+            {
+                break;
+            }
+
+            if (!string.IsNullOrEmpty(data.speakingContent) && !string.IsNullOrEmpty(data.avatarImageFileName))
+            {
+                buttonTexts.Add(data.speakingContent);
+                jumpTargets.Add(data.avatarImageFileName);
+            }
+
+            lineIndex++;
+        }
+
+        currentLine = lineIndex;
+
+        Debug.Log($"准备显示 {buttonTexts.Count} 个调查按钮");
+
+        for (int i = 0; i < investigationButtons2.Length; i++)
+        {
+            if (i < buttonTexts.Count)
+            {
+                investigationButtons2[i].gameObject.SetActive(true);
+                int index = i;
+                investigationButtons2[i].GetComponentInChildren<TextMeshProUGUI>().text = buttonTexts[i];
+                investigationButtons2[i].onClick.RemoveAllListeners();
+                investigationButtons2[i].onClick.AddListener(() =>
+                {
+                    Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
+                    InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
+                });
+            }
+            else
+            {
+                investigationButtons2[i].gameObject.SetActive(false);
+            }
+        }
+
+        // ✅ 显式激活面板（如果没激活）
+        if (investigatePanel2 != null)
+        {
+            investigatePanel2.SetActive(true);
+            Debug.Log("investigatePanel2.SetActive(true)");
+        }
+        else
+        {
+            Debug.LogError("investigatePanel2 未绑定");
         }
     }
 
