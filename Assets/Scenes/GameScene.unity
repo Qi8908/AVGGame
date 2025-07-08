@@ -9732,6 +9732,11 @@ MonoBehaviour:
   galleryButton: {fileID: 1268385909}
   quitButton: {fileID: 2017569370}
   guidePanel: {fileID: 384489293}
+  guideImage: {fileID: 384489295}
+  guideSprites:
+  - {fileID: 21300000, guid: 5acb3f5aea753430d8034cc5ecd9390f, type: 3}
+  - {fileID: 21300000, guid: d4935df9affb14cb9b752cadc1d5e19e, type: 3}
+  - {fileID: 21300000, guid: 519d5a39f489641198ff50c44b1ad267, type: 3}
 --- !u!1 &1355250226
 GameObject:
   m_ObjectHideFlags: 0

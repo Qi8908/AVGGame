@@ -14,6 +14,9 @@ public class MenuManager : MonoBehaviour
     public Button galleryButton;
     public Button quitButton;
     public GameObject guidePanel;
+    public Image guideImage;
+    public List<Sprite> guideSprites;
+    private int currentGuideIndex = 0;
 
     private bool hasStarted = false;
     public static MenuManager Instance { get; private set; }
@@ -71,18 +74,33 @@ public class MenuManager : MonoBehaviour
         // VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
         // StopMenuMusic();
         // ShowGamePanel();
-        guidePanel.SetActive(true); // 先显示引导图
+
+        currentGuideIndex = 0;
+        guideImage.sprite = guideSprites[currentGuideIndex];  // 显示第一张引导图
+        guidePanel.SetActive(true);
+
         startButton.interactable = false;
         menuPanel.SetActive(true);
     }
 
     public void OnGuidePanelClicked()
     {
-        hasStarted = true;
-        guidePanel.SetActive(false); // 隐藏引导图
-        VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
-        StopMenuMusic();
-        ShowGamePanel();
+        currentGuideIndex++;
+
+        if (currentGuideIndex >= guideSprites.Count)
+        {
+            // 引导页播放完毕，正式进入游戏
+            hasStarted = true;
+            guidePanel.SetActive(false);
+            VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
+            StopMenuMusic();
+            ShowGamePanel();
+        }
+        else
+        {
+            // 切换到下一张引导图
+            guideImage.sprite = guideSprites[currentGuideIndex];
+        }
     }
 
     private void ContinueGame()
