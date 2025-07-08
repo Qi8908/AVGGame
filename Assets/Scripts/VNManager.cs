@@ -35,6 +35,8 @@ public class VNManager : MonoBehaviour
     public Button[] investigationButtons;
     public GameObject investigatePanel2;
     public Button[] investigationButtons2;
+    public GameObject investigatePanel3;
+    public Button[] investigationButtons3;
 
     public GameObject mapPanel;
     public GameObject suspectPanel;
@@ -87,6 +89,7 @@ public class VNManager : MonoBehaviour
 
     void Start()
     {
+        Screen.SetResolution(1920, 1080, false);
         InitializeSaveFilePath();
         BottomButtonsAddListener();
         TopButtonsAddListener();
@@ -189,7 +192,8 @@ public class VNManager : MonoBehaviour
         choicePanel.SetActive(false);
 
         investigatePanel.SetActive(false); // R
-        investigatePanel2.SetActive(false); // R
+        investigatePanel2.SetActive(false);
+        investigatePanel3.SetActive(false);
     }
 
     IEnumerator LoadStoryFromStreamingAssets(string fileName)
@@ -293,15 +297,18 @@ public class VNManager : MonoBehaviour
             ShowInvestigation2();
             return;
         }
+        if (data.speakerName == Constants.INVESTIGATE3)
+        {
+            ShowInvestigation3();
+            return;
+        }
 
-        // 自动播放关闭逻辑（如果刚好到末尾）
         if (currentLine == storyData.Count - 1 && isAutoPlay)
         {
             isAutoPlay = false;
             UpdateButtonImage(Constants.AUTO_OFF, autoButton);
         }
 
-        // 打字机中 → 快进；否则 → 显示下一行
         if (typewriterEffect.IsTyping())
         {
             typewriterEffect.CompleteLine();
@@ -478,7 +485,6 @@ public class VNManager : MonoBehaviour
                 return;
             }
 
-            // 后续行为选项内容，直到 Name 列不为空或读完
             if (lineIndex > currentLine && !string.IsNullOrEmpty(data.speakerName))
             {
                 break;
@@ -493,7 +499,6 @@ public class VNManager : MonoBehaviour
             lineIndex++;
         }
 
-        // 跳过所有选项行
         currentLine = lineIndex;
 
         for (int i = 0; i < choiceTexts.Count; i++)
@@ -649,6 +654,75 @@ public class VNManager : MonoBehaviour
         }
     }
 
+    void ShowInvestigation3()
+    {
+        Debug.Log("ShowInvestigate3 被调用了");
+
+        List<string> buttonTexts = new List<string>();
+        List<string> jumpTargets = new List<string>();
+
+        int lineIndex = currentLine;
+        while (lineIndex < storyData.Count)
+        {
+            var data = storyData[lineIndex];
+
+            Debug.Log($"Reading line {lineIndex}: speakerName = [{data.speakerName}], content = [{data.speakingContent}], jump = [{data.avatarImageFileName}]");
+
+            if (lineIndex == currentLine && data.speakerName != "Investigate3")
+            {
+                Debug.LogError("Expected 'Investigate' marker but got: " + data.speakerName);
+                return;
+            }
+
+            if (lineIndex > currentLine && !string.IsNullOrEmpty(data.speakerName))
+            {
+                break;
+            }
+
+            if (!string.IsNullOrEmpty(data.speakingContent) && !string.IsNullOrEmpty(data.avatarImageFileName))
+            {
+                buttonTexts.Add(data.speakingContent);
+                jumpTargets.Add(data.avatarImageFileName);
+            }
+
+            lineIndex++;
+        }
+
+        currentLine = lineIndex;
+
+        Debug.Log($"准备显示 {buttonTexts.Count} 个调查按钮");
+
+        for (int i = 0; i < investigationButtons3.Length; i++)
+        {
+            if (i < buttonTexts.Count)
+            {
+                investigationButtons3[i].gameObject.SetActive(true);
+                int index = i;
+                investigationButtons3[i].GetComponentInChildren<TextMeshProUGUI>().text = buttonTexts[i];
+                investigationButtons3[i].onClick.RemoveAllListeners();
+                investigationButtons3[i].onClick.AddListener(() =>
+                {
+                    Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
+                    InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
+                });
+            }
+            else
+            {
+                investigationButtons3[i].gameObject.SetActive(false);
+            }
+        }
+
+        // ✅ 显式激活面板（如果没激活）
+        if (investigatePanel3 != null)
+        {
+            investigatePanel3.SetActive(true);
+            Debug.Log("investigatePanel3.SetActive(true)");
+        }
+        else
+        {
+            Debug.LogError("investigatePanel3 未绑定");
+        }
+    }
 
     #endregion
 

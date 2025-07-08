@@ -19,6 +19,7 @@ public class Constants
     public static int DURATION_TIME = 1;
     public static string INVESTIGATE = "Investigate"; // R
     public static string INVESTIGATE2 = "Investigate2";
+    public static string INVESTIGATE3 = "Investigate3";
 
     // TypewriterEffect
     public static float DEFAULT_TYPING_SECONDS = 0.05f; // 0.05f
@@ -66,7 +67,7 @@ public class Constants
     public static string GALLERY = "Knowledge Gallery";
     public static string GALLERY_PLACEHOLDER = "Gallery_Placeholder"; // 占位
     public static int DEFAULT_START_INDEX = 0;
-    public static readonly string[] ALL_HISTORY_IMAGES = { "History1", "History2", "History3", "History4", "History5", "History6", "History7", "History8", "History9", "History10", "History11", "History12", "History13", "History14", "History15", "History16" };
+    public static readonly string[] ALL_HISTORY_IMAGES = { "History1", "History2", "History3", "History4", "History5", "History6", "History7", "History8", "History9", "History10", "History11", "History12", "History13", "History14", "History15", "History16", "History17", "History18", "History19", "History20" };
     public static string UNLOCKED = "Unlocked";
     public static string THUMBNAIL_PATH = "Thumbnail/";
     public static string BIG_HISTORY_PATH = "BigHistory/";
