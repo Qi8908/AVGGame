@@ -31,7 +31,7 @@ public class VNManager : MonoBehaviour
     public Button choiceButtonPrefab;
     private List<Button> currentChoiceButtons = new List<Button>();
 
-    public GameObject investigatePanel; // R
+    public GameObject investigatePanel;
     public Button[] investigationButtons;
     public GameObject investigatePanel2;
     public Button[] investigationButtons2;
@@ -59,6 +59,8 @@ public class VNManager : MonoBehaviour
     private string saveFolderPath;
     private byte[] screenShotData; // 保存截图数据
     private string currentSpeakingContent; // 保存当前对话内容
+    public string lastPlayedStoryFileName; // 7.8
+    public int lastPlayedLine; // 7.8
 
     private List<ExcelReader.ExcelData> storyData;
     private int currentLine;
@@ -157,10 +159,13 @@ public class VNManager : MonoBehaviour
 
     public void StartGame(string fileName, int startLine)
     {
+        lastPlayedStoryFileName = Constants.DEFAULT_STORY_FILE_NAME; // 7.8
+        lastPlayedLine = Constants.DEFAULT_START_LINE; // 7.8
+
         InitializeAndLoadStory(defaultStoryFileName, defaultStartLine);
     }
 
-    void InitializeAndLoadStory(string fileName, int lineNumber)
+    public void InitializeAndLoadStory(string fileName, int lineNumber)
     {
         Initialize(lineNumber);
         //LoadStoryFromFile(fileName);
@@ -254,6 +259,13 @@ public class VNManager : MonoBehaviour
     #region Display
     void DisplayNextLine()
     {
+        if (typewriterEffect.IsTyping())
+        {
+            typewriterEffect.CompleteLine();
+            StopVocalAudio();
+            return;
+        }
+
         // 防止越界
         if (currentLine >= storyData.Count)
             return;
@@ -314,6 +326,12 @@ public class VNManager : MonoBehaviour
             typewriterEffect.CompleteLine();
             StopVocalAudio();
         }
+
+        if (data.speakerName == Constants.END_OF_GAME)
+        {
+            EndGameAndReturnToMenu();
+            return;
+        }
         else
         {
             DisplayThisLine();
@@ -323,6 +341,10 @@ public class VNManager : MonoBehaviour
     void DisplayThisLine()
     {
         var data = storyData[currentLine];
+
+        lastPlayedStoryFileName = currentStoryFileName;
+        lastPlayedLine = currentLine - 1;
+
         speakerName.text = data.speakerName;
         currentSpeakingContent = data.speakingContent;
         typewriterEffect.StartTyping(currentSpeakingContent, currentTypingSpeed);
@@ -401,7 +423,9 @@ public class VNManager : MonoBehaviour
         {
             UpdateSoundEffect(data.seAction, data.soundEffectFileName);
         }
+
         currentLine++;
+
     }
 
     void RecordHistory(string speaker, string content)
@@ -779,6 +803,13 @@ public class VNManager : MonoBehaviour
         }
     }
 
+    private void EndGameAndReturnToMenu()
+    {
+        gamePanel.SetActive(false);
+        MenuManager.Instance.menuPanel.SetActive(true);
+        Debug.Log("Game ended. Returning to main menu.");
+    }
+
     #endregion
 
     #region Images
@@ -995,7 +1026,8 @@ public class VNManager : MonoBehaviour
         public string savedSpeakingContent;
         public byte[] screenShotData;
         public LinkedList<string> savedHistoryRecords;
-        public string savedBGM; //
+        public string savedBGM;
+        public List<string> savedUnlockedHistoryImages; // 7.8
     }
     void OnSaveButtonClick()
     {
@@ -1015,7 +1047,9 @@ public class VNManager : MonoBehaviour
             savedSpeakingContent = currentSpeakingContent,
             screenShotData = screenShotData,
             savedHistoryRecords = historyRecords, // 历史记录也要跟随每个存档
-            savedBGM = currentBackgroundMusicName
+            savedBGM = currentBackgroundMusicName,
+            savedUnlockedHistoryImages = new List<string>(unlockedHistoryImage) // 7.8
+
         };
         string savePath = Path.Combine(saveFolderPath, slotIndex + Constants.SAVE_FILE_EXTENSION);
         string json = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -1044,10 +1078,24 @@ public class VNManager : MonoBehaviour
             historyRecords.RemoveLast(); // 加载存档时移除最后一条历史记录
             currentBackgroundMusicName = saveData.savedBGM;
             MenuManager.Instance.StopMenuMusic();
+
+            unlockedHistoryImage.Clear(); // 清除旧数据
+            if (saveData.savedUnlockedHistoryImages != null)
+            {
+                foreach (var cardName in saveData.savedUnlockedHistoryImages)
+                {
+                    unlockedHistoryImage.Add(cardName); // 恢复已解锁的卡片
+                }
+                GalleryManager.Instance?.UpdateUI(); // 刷新图库 UI（如果存在）
+            }
+
             var lineNumber = saveData.savedLine - 1;
+            lastPlayedStoryFileName = saveData.savedStoryFileName; // 7.8
+            lastPlayedLine = lineNumber; // 7.8
             InitializeAndLoadStory(saveData.savedStoryFileName, lineNumber);
         }
     }
+
     #endregion
 
     #region Home

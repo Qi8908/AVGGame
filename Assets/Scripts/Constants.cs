@@ -10,6 +10,7 @@ public class Constants
 
     // Action
     public static string END_OF_STORY = "End of story";
+    public static string END_OF_GAME = "End of game";
     public static string CHOICE = "Choice";
     public static string APPEAR_AT = "appearAt";
     public static string APPEAR_AT_INSTANTLY = "appearAtInstantly";

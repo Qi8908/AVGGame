@@ -17,8 +17,7 @@ public class MenuManager : MonoBehaviour
     public Image guideImage;
     public List<Sprite> guideSprites;
     private int currentGuideIndex = 0;
-
-    private bool hasStarted = false;
+    //private bool hasStarted = false;
     public static MenuManager Instance { get; private set; }
 
     void Awake()
@@ -90,7 +89,7 @@ public class MenuManager : MonoBehaviour
         if (currentGuideIndex >= guideSprites.Count)
         {
             // 引导页播放完毕，正式进入游戏
-            hasStarted = true;
+            //hasStarted = true;
             guidePanel.SetActive(false);
             VNManager.Instance.StartGame(Constants.DEFAULT_STORY_FILE_NAME, Constants.DEFAULT_START_LINE);
             StopMenuMusic();
@@ -105,9 +104,19 @@ public class MenuManager : MonoBehaviour
 
     private void ContinueGame()
     {
-        if (hasStarted)
+        //if (hasStarted)
+        //{
+        //ShowGamePanel();
+        //}
+        if (VNManager.Instance != null && !string.IsNullOrEmpty(VNManager.Instance.lastPlayedStoryFileName))
         {
-            ShowGamePanel();
+            menuPanel.SetActive(false);
+            VNManager.Instance.gamePanel.SetActive(true);
+            VNManager.Instance.InitializeAndLoadStory(VNManager.Instance.lastPlayedStoryFileName, VNManager.Instance.lastPlayedLine);
+        }
+        else
+        {
+            Debug.LogWarning("ContinueGame: No previous game state found.");
         }
     }
 

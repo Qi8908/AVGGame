@@ -58,7 +58,7 @@ public class GalleryManager : MonoBehaviour
         galleryPanel.SetActive(true);
     }
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
         for (int i = 0; i < slotsPerPage; ++i)
         {

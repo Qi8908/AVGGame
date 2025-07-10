@@ -9,7 +9,7 @@ public class TypewriterEffect : MonoBehaviour
     public float waitingSeconds = Constants.DEFAULT_TYPING_SECONDS;
     private Coroutine typingCoroutine;
     private bool isTyping;
-    private float typingSpeed = 0.05f;
+    private float typingSpeed = 0.01f;
 
     public System.Action onTypingComplete;
 
