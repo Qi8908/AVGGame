@@ -67,6 +67,7 @@ public class Constants
     public static int GALLERY_SLOTS_PER_PAGE = 9;
     public static string GALLERY = "Knowledge Gallery";
     public static string GALLERY_PLACEHOLDER = "Gallery_Placeholder"; // 占位
+    public static string SAVE_PLACEHOLDER = "Save_Placeholder"; // 占位
     public static int DEFAULT_START_INDEX = 0;
     public static readonly string[] ALL_HISTORY_IMAGES = { "History1", "History2", "History3", "History4", "History5", "History6", "History7", "History8", "History9", "History10", "History11", "History12", "History13", "History14", "History15", "History16", "History17", "History18", "History19", "History20" };
     public static string UNLOCKED = "Unlocked";

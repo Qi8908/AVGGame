@@ -77,7 +77,7 @@ public class SaveLoadManager : MonoBehaviour
         }
     }
 
-    private void UpdateSaveLoadButtons(Button button, int index)
+    /*private void UpdateSaveLoadButtons(Button button, int index)
     {
         button.gameObject.SetActive(true);
         button.interactable = true;
@@ -97,7 +97,53 @@ public class SaveLoadManager : MonoBehaviour
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => OnButtonClick(button, index));
+    }*/
+
+    private void UpdateSaveLoadButtons(Button button, int index)
+    {
+        button.gameObject.SetActive(true);
+
+        var savePath = GenerateDataPath(index);
+        var fileExists = File.Exists(savePath);
+
+        var textComponents = button.GetComponentsInChildren<TextMeshProUGUI>();
+        var image = button.GetComponentInChildren<RawImage>();
+
+        if (fileExists)
+        {
+            // ✅ 有存档：设置默认文字、等待 LoadStorylineAndScreenshots 填入截图和文字
+            button.interactable = true;
+            textComponents[0].text = ""; // 内容文本
+            textComponents[1].text = (index + 1) + Constants.COLON + Constants.EMPTY_SLOT; // 时间或 slot 名称
+            image.texture = null;
+        }
+        else
+        {
+            // ✅ 无存档：显示占位图 + Locked 文本
+            button.interactable = true;
+
+            // 设置“Locked”文字
+            textComponents[0].text = "Empty Slot";
+            textComponents[1].text = "";
+
+            // 加载 Resources 中的占位图
+            Texture2D placeholder = Resources.Load<Texture2D>(Constants.THUMBNAIL_PATH + Constants.SAVE_PLACEHOLDER);
+            if (placeholder != null)
+            {
+                image.texture = placeholder;
+            }
+            else
+            {
+                Debug.LogWarning("占位图未找到：" + Constants.THUMBNAIL_PATH + Constants.SAVE_PLACEHOLDER);
+                image.texture = null;
+            }
+        }
+
+        // 更新点击事件
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(() => OnButtonClick(button, index));
     }
+
 
     private void OnButtonClick(Button button, int index)
     {

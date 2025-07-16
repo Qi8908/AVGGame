@@ -482,6 +482,18 @@ public class VNManager : MonoBehaviour
     #endregion
 
     #region Choices
+    void SetGameButtonsInteractable(bool interactable)
+    {
+        autoButton.interactable = interactable;
+        skipButton.interactable = interactable;
+        saveButton.interactable = interactable;
+        loadButton.interactable = interactable;
+        historyButton.interactable = interactable;
+        mapButton.interactable = interactable;
+        suspectButton.interactable = interactable;
+        homeButton.interactable = interactable;
+    }
+
     void ShowChoices()
     {
         // 清除旧按钮
@@ -492,6 +504,7 @@ public class VNManager : MonoBehaviour
         currentChoiceButtons.Clear();
 
         choicePanel.SetActive(true);
+        SetGameButtonsInteractable(false); // 7.10
 
         // 从当前行开始，逐行读取所有选项（直到遇到下一行不是空的或文件结束）
         List<string> choiceTexts = new List<string>();
@@ -532,6 +545,8 @@ public class VNManager : MonoBehaviour
             newButton.GetComponentInChildren<TextMeshProUGUI>().text = choiceTexts[i];
             newButton.onClick.AddListener(() =>
             {
+                choicePanel.SetActive(false); // 7.10
+                SetGameButtonsInteractable(true); // 7.10
                 InitializeAndLoadStory(jumpFiles[choiceIndex], Constants.DEFAULT_START_LINE);
             });
             currentChoiceButtons.Add(newButton);
@@ -540,6 +555,7 @@ public class VNManager : MonoBehaviour
 
     void ShowInvestigation()
     {
+        SetGameButtonsInteractable(false);
         Debug.Log("ShowInvestigation 被调用了");
 
         List<string> buttonTexts = new List<string>();
@@ -586,6 +602,7 @@ public class VNManager : MonoBehaviour
                 investigationButtons[i].onClick.RemoveAllListeners();
                 investigationButtons[i].onClick.AddListener(() =>
                 {
+                    SetGameButtonsInteractable(true);
                     Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
                     InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
                 });
@@ -610,6 +627,7 @@ public class VNManager : MonoBehaviour
 
     void ShowInvestigation2()
     {
+        SetGameButtonsInteractable(false);
         Debug.Log("ShowInvestigate2 被调用了");
 
         List<string> buttonTexts = new List<string>();
@@ -656,6 +674,7 @@ public class VNManager : MonoBehaviour
                 investigationButtons2[i].onClick.RemoveAllListeners();
                 investigationButtons2[i].onClick.AddListener(() =>
                 {
+                    SetGameButtonsInteractable(true);
                     Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
                     InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
                 });
@@ -680,6 +699,7 @@ public class VNManager : MonoBehaviour
 
     void ShowInvestigation3()
     {
+        SetGameButtonsInteractable(false);
         Debug.Log("ShowInvestigate3 被调用了");
 
         List<string> buttonTexts = new List<string>();
@@ -726,6 +746,7 @@ public class VNManager : MonoBehaviour
                 investigationButtons3[i].onClick.RemoveAllListeners();
                 investigationButtons3[i].onClick.AddListener(() =>
                 {
+                    SetGameButtonsInteractable(true);
                     Debug.Log($"点击了调查按钮 {index}，跳转到 {jumpTargets[index]}");
                     InitializeAndLoadStory(jumpTargets[index], Constants.DEFAULT_START_LINE);
                 });
